@@ -12,6 +12,20 @@
 
   <body>
     <div class='container'>
+      <div class='my-3'>
+        <% flash.each do |type, msg| %>
+          <% case type %>
+          <% when "alert" %>
+            <div class="alert alert-danger">
+              <%= msg %>
+            </div>
+          <% when "notice" %>
+            <div class="alert alert-success">
+              <%= msg %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
       <%= yield %>
     </div>
   </body>
