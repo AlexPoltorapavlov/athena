@@ -1,13 +1,12 @@
 <div class="container pt-5 w-100">
   <h3>Пользователь</h3>
+  <p>Данные</p>
   <div class="w-50">
     <div class="form-group">
-      <label for="email">Электронная почта</label>
-      <input type="text" id="email" value="<%= @user.email %>" readonly class="form-control">
+      <input type="text" id="email" value="<%= @user.email %>" readonly class="form-control bg-white text-secondary">
     </div>
-    <div class="form-group">
-      <label for="password">Пароль</label>
-      <input type="password" id="password" value="***********" readonly class="form-control">
+    <div class="form-group mt-1">
+      <input type="password" id="password" value="***********" readonly class="form-control bg-white text-secondary">
     </div>
 
     <%= link_to "Редактировать", edit_user_registration_path, class: "btn btn-dark mt-3" %>
