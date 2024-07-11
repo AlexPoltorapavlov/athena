@@ -9,6 +9,10 @@ Rails.application.routes.draw do
 
   resources :admin_panel
 
+  devise_scope :user do
+    get 'account', to: 'users/registrations#account'
+  end
+
   # Defines the root path route ("/")
   root 'admin_panel#index'
 
