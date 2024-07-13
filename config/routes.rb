@@ -16,4 +16,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root 'admin_panel#index'
 
+  telegram_webhook WebhookController, :default
+
+
 end

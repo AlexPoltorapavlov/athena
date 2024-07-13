@@ -291,7 +291,7 @@ DEPENDENCIES
   selenium-webdriver
   sprockets-rails
   stimulus-rails
-  telegram-bot
+  telegram-bot (~> 0.16.2)
   turbo-rails
   tzinfo-data
   web-console
