@@ -1,4 +1,7 @@
 class AdminsController < ApplicationController
+  before_action :authorize_admin
+
+
   def admin_panel
     @users = User.all
   end
@@ -46,5 +49,9 @@ class AdminsController < ApplicationController
     params.require(:user).permit(:name, :telegram_link, :email, :password, :password_confirmation)
   end
 
+
+  def authorize_admin
+    authorize! :manage, :admin
+  end
 
 end
