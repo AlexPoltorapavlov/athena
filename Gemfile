@@ -73,3 +73,5 @@ gem "devise", "~> 4.9"
 gem "cancancan", "~> 3.6"
 
 gem "telegram-bot", "~> 0.16.2"
+
+gem "securerandom", "~> 0.3.1"

@@ -1,0 +1,37 @@
+<h2> Панель Администратора </h2>
+
+<div class='w-50 mt-5'>
+  <div class='w-100'>
+    <div class='d-flex justify-content-between'>
+      <p class="fw-bold"> Список пользователей </p>
+      <%= link_to 'Добавить', new_user_path, class: 'btn btn-dark'%>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Электронная почта</th>
+          <th scope="col">Ссылка на телеграм</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <% if user.is_user? %>
+            <tr>
+              <th scope="row"><%= user.id %></th>
+              <td><%= user.email %></td>
+              <td><%= user.telegram_link %></td>
+              <td>
+                <%= link_to 'Edit', edit_user_path(user), class: 'btn btn-primary' %>
+                <%= button_to 'Delete', admin_panel_path(user), method: :destroy_user, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+

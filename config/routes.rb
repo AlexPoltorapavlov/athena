@@ -7,16 +7,21 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  resources :admin_panel
-
   devise_scope :user do
-    get 'account', to: 'users/registrations#account'
+    get 'account' => 'users/registrations#account'
   end
 
   # Defines the root path route ("/")
-  root 'admin_panel#index'
+  root 'home#index'
 
-  telegram_webhook WebhookController, :default
+  controller :admins do
+    get :admin_panel
+    get :new_user
+    get :edit_user
+    post :create_user
+    patch :update_user
+    delete :destroy_user
+  end
 
-
+  telegram_webhook WebhookController
 end

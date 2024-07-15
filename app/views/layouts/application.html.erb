@@ -13,6 +13,14 @@
     <div class="container-fluid">
       <div class="row">
         <% if !current_user.nil? %>
+          <div class="btn-group" role="group">
+            <% if !current_user.nil? %>
+              <%= button_to "Выйти", destroy_user_session_path, method: :delete, class: 'btn btn-primary' %>
+            <% else %>
+              <%= button_to "Войти", new_user_session_path, method: :get, class: 'btn btn-outline-primary me-md-2' %>
+              <%= button_to "Регистрация", new_user_registration_path, method: :get, class: 'btn btn-outline-primary' %>
+            <% end %>
+          </div>
           <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3">
             <div class="position-sticky">
               <ul class="nav flex-column">
@@ -21,13 +29,9 @@
                     Меню
                   </p>
                 </li>
-                <% if can? :manage, :all %>
                   <li class="nav-item">
-                    <%= link_to 'Администратор', admin_panel_index_path, class: 'text-dark bg-light btn btn-outline-secondary'%>
+                    <%= link_to (can?(:manage, :all) ? 'Администратор' : 'Пользователь'), root_path, class: 'text-dark bg-light btn btn-outline-secondary' %>
                   </li>
-                <% else %>
-                    <%= link_to 'Пользователь', account_path, class: 'text-dark bg-light btn btn-outline-secondary'%>
-                <% end %>
                 <li class="nav-item text-dark">
                   <a class="text-dark bg-light btn btn-outline-secondary" href="#">
                     Bootstrap
@@ -58,6 +62,8 @@
           <% end %>
         <% end %>
       </div>
+
+
       <%= yield %>
         </main>
       </div>

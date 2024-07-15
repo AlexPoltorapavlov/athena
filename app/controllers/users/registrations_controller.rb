@@ -30,8 +30,18 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   def account
-    @user = current_user
+    if current_user.nil?
+      redirect_to new_user_session_path
+    else
+      @user = current_user
+    end
   end
+
+  # private
+
+  # def user_params
+  #   params.require(:user).permit(:attribute1, :attribute2, :attribute3) # replace with actual attributes
+  # end
 
   # GET /resource/cancel
   # Forces the session data which is usually expired after sign

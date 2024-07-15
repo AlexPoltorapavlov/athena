@@ -6,7 +6,7 @@ class WebhookController < Telegram::Bot::UpdatesController
   # callback_query, etc.
   # Define method with the same name to handle this type of update.
   def message(message)
-    # store_message(message['text'])
+    respond_with(:message, text: message['text'])
   end
 
   # For the following types of updates commonly used params are passed as arguments,
@@ -23,21 +23,20 @@ class WebhookController < Telegram::Bot::UpdatesController
   # someone passed more or less arguments in the message.
   def start!(word = nil, *other_words)
     # do_smth_with(word)
-    for i in (1..10)
-      puts('Привет!')
-    end
+
     # full message object is also available via `payload` instance method:
     # process_raw_message(payload['text'])
 
     # There are `chat` & `from` shortcut methods.
     # For callback queries `chat` is taken from `message` when it's available.
-    # response = from ? "Hello #{from['username']}!" : 'Hi there!'
+    response = from ? "Hello #{from['username']}!" : 'Hi there!'
 
-    # # There is `respond_with` helper to set `chat_id` from received message:
-    # respond_with :message, text: response
+    # There is `respond_with` helper to set `chat_id` from received message:
+    respond_with :message, text: response
 
-    # # `reply_with` also sets `reply_to_message_id`:
-    # reply_with :photo, photo: File.open('party.jpg')
+    # `reply_with` also sets `reply_to_message_id`:
+    reply_with :photo, photo: File.open('party.jpg')
+
   end
 
   private
