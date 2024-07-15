@@ -22,6 +22,38 @@ class WebhookController < Telegram::Bot::UpdatesController
   # Be sure to use splat args and default values to not get errors when
   # someone passed more or less arguments in the message.
   def start!(word = nil, *other_words)
+    puts "\n\nStart! method called\n\n"
+    user = find_user_by_name(from['username'])
+    puts "\n\nUser found: #{user.inspect}\n\n"
+
+    if user.nil?
+      login = SecureRandom.hex(4)
+      password = SecureRandom.hex(4)
+
+      puts "\n\nCreating new user with login: #{login} and password: #{password}\n\n"
+
+      @user = User.new(telegram_link: from['username'].to_s, name: login.to_s, password: password.to_s)
+
+      if @user.save
+        puts "\n\nUser saved successfully\n\n"
+        response = "Приветствую! Данные для входа: \n
+        Логин: #{login} \n
+        Пароль: #{password} \n
+        Приятного пользования"
+      else
+        puts "\n\nFailed to save user: #{@user.errors.full_messages.join(', ')}\n\n"
+
+        response = "Приветствую! Я не смогла создать тебе аккаунт, попробуй запустить меня еще раз."
+      end
+    else
+      puts "\n\nWelcome back, #{form.first_name}!\n\n"
+
+      response = "С возвращением, #{form.first_name}!"
+    end
+
+    respond_with :message, text: response
+  end
+
     # do_smth_with(word)
 
     # full message object is also available via `payload` instance method:
@@ -29,15 +61,15 @@ class WebhookController < Telegram::Bot::UpdatesController
 
     # There are `chat` & `from` shortcut methods.
     # For callback queries `chat` is taken from `message` when it's available.
-    response = from ? "Hello #{from['username']}!" : 'Hi there!'
+    # response = from ? "Привет, #{from['username']}!" : 'Привет!'
 
-    # There is `respond_with` helper to set `chat_id` from received message:
-    respond_with :message, text: response
+    # # There is `respond_with` helper to set `chat_id` from received message:
+    # respond_with :message, text: response
 
-    # `reply_with` also sets `reply_to_message_id`:
-    reply_with :photo, photo: File.open('party.jpg')
+    # # `reply_with` also sets `reply_to_message_id`:
+    # reply_with :photo, photo: File.open('party.jpg')
 
-  end
+
 
   private
 
@@ -52,4 +84,9 @@ class WebhookController < Telegram::Bot::UpdatesController
       # locale for chat
     end
   end
+
+  def find_user_by_name(name)
+    User.find_by(telegram_link: name)
+  end
+
 end

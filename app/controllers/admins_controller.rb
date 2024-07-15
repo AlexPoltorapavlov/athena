@@ -15,7 +15,7 @@ class AdminsController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      redirect_to admins_path, notice: 'Пользователь успешно создан'
+      redirect_to admin_panel_path, notice: 'Пользователь успешно создан'
     else
       Rails.logger.debug "User errors: #{@user.errors.full_messages}"
       render :new_user, alert: "Ошибка при создании пользователя: #{@user.errors.full_messages.to_sentence}."
@@ -46,7 +46,7 @@ class AdminsController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :telegram_link, :email, :password, :password_confirmation)
+    params.require(:user).permit(:id, :name, :telegram_link, :email, :password, :password_confirmation)
   end
 
 

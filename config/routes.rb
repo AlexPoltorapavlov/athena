@@ -17,10 +17,11 @@ Rails.application.routes.draw do
   controller :admins do
     get :admin_panel
     get :new_user
-    get :edit_user
+    get ':id/edit_user', action: :edit_user, as: :edit_user
     post :create_user
-    patch :update_user
-    delete :destroy_user
+    patch ':id/update_user', action: :update_user, as: :update_user
+    # put ':id/update_user', action: :update_user, as: :update_user
+    delete ':id/destroy_user', action: :destroy_user, as: :destroy_user
   end
 
   telegram_webhook WebhookController
