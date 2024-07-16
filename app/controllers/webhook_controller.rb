@@ -32,7 +32,7 @@ class WebhookController < Telegram::Bot::UpdatesController
 
       puts "\n\nCreating new user with login: #{login} and password: #{password}\n\n"
 
-      @user = User.new(telegram_link: from['username'].to_s, name: login.to_s, password: password.to_s)
+      @user = User.new(telegram_link: from['username'].to_s, username: login.to_s, password: password.to_s)
 
       if @user.save
         puts "\n\nUser saved successfully\n\n"
