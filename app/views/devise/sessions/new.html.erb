@@ -7,7 +7,7 @@
             <h3 class="fw-bold mb-4 text-uppercase">Авторизация</h3>
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
                 <div class="form-outline form-white mb-4">
-                <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", placeholder: "Электронная почта" %>
+                <%= f.text_field :login, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", placeholder: "Электронная почта" %>
   </div>
                 <div class="form-outline form-white mb-4">
                 <%= f.password_field :password, autocomplete: "current-password", class: "form-control form-control-lg", placeholder: "Пароль" %>

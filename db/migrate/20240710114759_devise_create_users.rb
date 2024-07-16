@@ -9,6 +9,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.1]
 
       t.string :username, null: false, default: ""
       t.string :login, null: false, default: ""
+
       t.string :telegram_link, null: false, default: ""
       t.string :role, null: false, default: "user"
 

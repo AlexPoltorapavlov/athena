@@ -32,14 +32,14 @@ class WebhookController < Telegram::Bot::UpdatesController
 
       puts "\n\nCreating new user with login: #{login} and password: #{password}\n\n"
 
-      @user = User.new(telegram_link: from['username'].to_s, username: login.to_s, password: password.to_s)
+      @user = User.new(telegram_link: from['username'].to_s, password: password.to_s)
 
       if @user.save
         puts "\n\nUser saved successfully\n\n"
         response = "Приветствую! Данные для входа: \n
-        Логин: #{login} \n
+        Логин: #{from['username']} \n
         Пароль: #{password} \n
-        Приятного пользования"
+        Приятного пользования!"
       else
         puts "\n\nFailed to save user: #{@user.errors.full_messages.join(', ')}\n\n"
 
