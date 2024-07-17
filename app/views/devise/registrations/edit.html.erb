@@ -5,8 +5,8 @@
 
     <div class="w-50">
       <div class="form-group mt-3">
-        <%= f.label :email, "Электронная почта" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control" %>
+        <%= f.label :email, "Логин" %>
+        <%= f.text_field :email, autofocus: true, class: "form-control" %>
   </div>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>

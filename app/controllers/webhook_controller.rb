@@ -1,12 +1,29 @@
 class WebhookController < Telegram::Bot::UpdatesController
   # use callbacks like in any other controller
   around_action :with_locale
+  before_action :is_chat?
 
   # Every update has one of: message, inline_query, chosen_inline_result,
   # callback_query, etc.
   # Define method with the same name to handle this type of update.
   def message(message)
-    respond_with(:message, text: message['text'])
+    # respond_with(:message, text: message['text'])
+  end
+
+  def my_chat_member(word = nil, *other_words)
+
+    bot_status = update['my_chat_member']['new_chat_member']['status']
+
+    if bot_status == 'member'
+      for i in (1..10) do
+        puts('Бот добавлен в чат!')
+      end
+    elsif bot_status == 'left'
+      for i in (1..10) do
+        puts('Бот вышел из чата!')
+      end
+    end
+
   end
 
   # For the following types of updates commonly used params are passed as arguments,
@@ -24,7 +41,7 @@ class WebhookController < Telegram::Bot::UpdatesController
   def start!(word = nil, *other_words)
     puts "\n\nStart! method called\n\n"
     user = find_user_by_name(from['username'])
-    puts "\n\nUser found: #{user.inspect}\n\n"
+    puts "\n\nUser found: #{user.id}\n\n" if user
 
     if user.nil?
       login = SecureRandom.hex(4)
@@ -32,13 +49,14 @@ class WebhookController < Telegram::Bot::UpdatesController
 
       puts "\n\nCreating new user with login: #{login} and password: #{password}\n\n"
 
-      @user = User.new(telegram_link: from['username'].to_s, password: password.to_s)
+      @user = User.new(email: login, password: password, telegram_link: from['username'],
+                       username: login, login: login )
 
       if @user.save
         puts "\n\nUser saved successfully\n\n"
         response = "Приветствую! Данные для входа: \n
-        Логин: #{from['username']} \n
-        Пароль: #{password} \n
+        Логин: \"#{login}\" \n
+        Пароль: \"#{password}\" \n
         Приятного пользования!"
       else
         puts "\n\nFailed to save user: #{@user.errors.full_messages.join(', ')}\n\n"
@@ -46,9 +64,9 @@ class WebhookController < Telegram::Bot::UpdatesController
         response = "Приветствую! Я не смогла создать тебе аккаунт, попробуй запустить меня еще раз."
       end
     else
-      puts "\n\nWelcome back, #{form.first_name}!\n\n"
+      puts "\n\nWelcome back, #{from['first_name']}!\n\n"
 
-      response = "С возвращением, #{form.first_name}!"
+      response = "С возвращением, #{from['first_name']}!"
     end
 
     respond_with :message, text: response
@@ -87,6 +105,10 @@ class WebhookController < Telegram::Bot::UpdatesController
 
   def find_user_by_name(name)
     User.find_by(telegram_link: name)
+  end
+
+  def is_chat?
+    puts ('сработал is_chat')
   end
 
 end
