@@ -10,9 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_10_114759) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_18_082402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "chats", force: :cascade do |t|
+    t.string "chat_name", null: false
+    t.string "chat_link", null: false
+    t.bigint "chat_id", null: false
+    t.bigint "group_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_chats_on_chat_id", unique: true
+    t.index ["chat_link"], name: "index_chats_on_chat_link", unique: true
+    t.index ["chat_name"], name: "index_chats_on_chat_name", unique: true
+    t.index ["group_id"], name: "index_chats_on_group_id"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "group_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_name"], name: "index_groups_on_group_name", unique: true
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -32,4 +52,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_114759) do
     t.index ["telegram_link"], name: "index_users_on_telegram_link", unique: true
   end
 
+  add_foreign_key "chats", "groups"
 end
