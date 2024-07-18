@@ -16,13 +16,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_18_082402) do
 
   create_table "chats", force: :cascade do |t|
     t.string "chat_name", null: false
-    t.string "chat_link", null: false
     t.bigint "chat_id", null: false
     t.bigint "group_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_chats_on_chat_id", unique: true
-    t.index ["chat_link"], name: "index_chats_on_chat_link", unique: true
     t.index ["chat_name"], name: "index_chats_on_chat_name", unique: true
     t.index ["group_id"], name: "index_chats_on_group_id"
   end

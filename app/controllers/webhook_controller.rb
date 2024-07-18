@@ -10,17 +10,36 @@ class WebhookController < Telegram::Bot::UpdatesController
     # respond_with(:message, text: message['text'])
   end
 
+  def start_mailing!
+    reply_with(:message, text: "Напишите сообщение, которое хотите отправить")
+  end
+
+
   def my_chat_member(word = nil, *other_words)
 
     bot_status = update['my_chat_member']['new_chat_member']['status']
+    chat_info = update['my_chat_member']['chat']
+
+    puts "Вывод chat_info: \n #{chat_info}"
 
     if bot_status == 'member'
-      for i in (1..10) do
-        puts('Бот добавлен в чат!')
+      puts 'Вход в условие с bot_status == \'member\''
+      chat = Chat.new( chat_id: chat_info['id'], chat_name: chat_info['title']+chat_info['id'].to_s, group: nil )
+      puts 'Было создание сущности чата.'
+      if chat.save!
+        puts 'Чат сохранен'
       end
     elsif bot_status == 'left'
-      for i in (1..10) do
-        puts('Бот вышел из чата!')
+      chat = Chat.find_by(chat_id: chat_info['id'])
+      if chat
+        puts "Попытка удалить чат с ID #{chat_info['id']}..."
+        if chat.destroy
+          puts "Чат с ID #{chat_info['id']} успешно удален."
+        else
+          puts "Не удалось удалить чат с ID #{chat_info['id']}. Ошибки: #{chat.errors.full_messages.join(', ')}"
+        end
+      else
+        puts "Чат с ID #{chat_info['id']} не найден."
       end
     end
 
