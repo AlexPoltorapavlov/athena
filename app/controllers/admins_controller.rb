@@ -3,7 +3,7 @@ class AdminsController < ApplicationController
 
 
   def admin_panel
-    @users = User.all
+    @users = User.where.not(role: 'admin')
   end
 
   def new_user
@@ -13,6 +13,8 @@ class AdminsController < ApplicationController
   def create_user
     puts "Parameters: #{params.inspect}"
     @user = User.new(user_params)
+    @user.password = SecureRandom.hex(4)
+
 
     if @user.save
       redirect_to admin_panel_path, notice: 'Пользователь успешно создан'
@@ -46,7 +48,7 @@ class AdminsController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:id, :username, :telegram_link, :email, :password, :password_confirmation)
+    params.require(:user).permit(:id, :telegram_link, :email, :username)
   end
 
 
