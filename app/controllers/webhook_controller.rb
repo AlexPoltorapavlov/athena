@@ -7,7 +7,7 @@ class WebhookController < Telegram::Bot::UpdatesController
 
   # use callbacks like in any other controller
   around_action :with_locale
-  # before_action :is_chat?
+  before_action :is_chat?
 
   # Every update has one of: message, inline_query, chosen_inline_result,
   # callback_query, etc.
@@ -167,4 +167,18 @@ class WebhookController < Telegram::Bot::UpdatesController
     Chat.find_by(chat_name: name)
   end
 
+  def add_chat_to_db(chat_id, chat_name)
+    chat = Chat.new( chat_id: chat_id, chat_name: chat_name + chat_id.to_s, group: nil )
+    chat.save!
+  end
+
+  def is_chat?
+    if chat['type'] != 'private'
+      unless Chat.find_by(chat_id: chat['id'])
+        add_chat_to_db(chat['id'], chat['title'])
+      else
+        return
+      end
+    end
+  end
 end
