@@ -1,0 +1,13 @@
+<h2>Редактировать чат</h2>
+
+<%= form_for(@chat) do |f| %> 
+  <div class='form-group'>
+    <%= f.label :chat_name, class: 'form-label mt-3' %>
+    <%= f.text_field :chat_name, class: 'form-control' %>
+    </div>
+  <div class='form-group mt-3'>
+    <%= f.label :group, class: 'form-label' %>
+    <%= f.text_field :group, class: 'form-control' %>
+  </div>
+  <%= f.submit "Сохранить", class: 'btn btn-primary mt-3' %>
+<% end %>
