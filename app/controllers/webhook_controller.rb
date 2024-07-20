@@ -1,5 +1,7 @@
 class WebhookController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
+  Telegram::Bot::Client.typed_response!
+
 
   self.session_store = :memory_store
 
@@ -11,7 +13,7 @@ class WebhookController < Telegram::Bot::UpdatesController
   # callback_query, etc.
   # Define method with the same name to handle this type of update.
   def message(message)
-    return if chat['type'] != 'private'
+    # return if chat['type'] != 'private'
     # respond_with(:message, text: message['text'])
   end
 
@@ -59,8 +61,15 @@ class WebhookController < Telegram::Bot::UpdatesController
     case message.downcase
     when 'отправить'
       @@selected_chats.each do |chat|
-        response_with
+        chat_id = find_chat_by_name(chat)
+        bot.send_message(chat_id: chat_id.chat_id, text: @@message_for_mailing)
       end
+      @@selected_chats = nil
+      @@message_for_mailing = nil
+      puts ("Переменные после очистки: #{@@selected_chats} #{@@message_for_mailing}")
+    else
+      save_context :send_mails
+      respond_with :message, text: 'Что-то не так, попробуйте ввести команду еще раз'
     end
   end
 
