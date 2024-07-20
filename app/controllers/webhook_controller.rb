@@ -25,8 +25,9 @@ class WebhookController < Telegram::Bot::UpdatesController
     return if chat['type'] != 'private'
 
     if message
-      @message = update['message']['text']
-      puts "Message received: #{@message}"
+      message = update['message']['text']
+      @@message_for_mailing = message
+      puts "Message received: #{@message_for_mailing}"
       chats = Chat.all
       list_of_chats = chats.map(&:chat_name).join(", ")
       puts ("Значение list_of_chats: \n #{list_of_chats}")
@@ -41,14 +42,26 @@ class WebhookController < Telegram::Bot::UpdatesController
 
   end
 
-  def choose_chats(message='', *)
+  def choose_chats(message=nil, *)
     return if chat['type'] != 'private'
-    puts ("Заход в choose_chats \n Значение передаваемой message: \n #{message}")
     selected_chats = update['message']['text']
-    puts ("Значение переменной selected_chats: \n #{selected_chats}")
+    @@selected_chats = selected_chats.split(/,\s*/)
+    save_context :send_mails
+    respond_with :message, text: "Подтвердите данные перед отправкой: \n
+    Сообщение: \"#{@@message_for_mailing}\" \n
+    Список чатов: #{@@selected_chats}
+    Если все верно, напишите \"Отправить\" \n
+    Если хотите изменить список чатов, то напишите \"Чаты\" \n
+    Ввести все данные заново: напишите /start_mailing"
+  end
 
-    # selected_chats = selected_chats.split(/,\s*/).map { |chat| chat.split('-').first.strip }
-    puts("Список выбранных чатов: #{selected_chats}")
+  def send_mails(message=nil, *)
+    case message.downcase
+    when 'отправить'
+      @@selected_chats.each do |chat|
+        response_with
+      end
+    end
   end
 
   def my_chat_member(word = nil, *other_words)
@@ -141,8 +154,8 @@ class WebhookController < Telegram::Bot::UpdatesController
     User.find_by(telegram_link: name)
   end
 
-  def string_chats_to_array(ctring_chats)
-
+  def find_chat_by_name(name)
+    Chat.find_by(chat_name: name)
   end
 
 end
