@@ -11,33 +11,41 @@ class WebhookController < Telegram::Bot::UpdatesController
   # callback_query, etc.
   # Define method with the same name to handle this type of update.
   def message(message)
+    return if chat['type'] != 'private'
     # respond_with(:message, text: message['text'])
   end
 
   def start_mailing!(*)
+    return if chat['type'] != 'private'
     save_context :get_mail
     respond_with(:message, text: "Напишите сообщение для рассылки")
   end
 
   def get_mail(message=nil, *)
+    return if chat['type'] != 'private'
 
     if message
-      user = find_user_by_name(from['username'])
-      user.mail = message
-      user.save
+      @message = message
+      puts "Message received: #{@message}"
+      chats = Chat.all
       save_context :choose_chats
+      respond_with :message, text: "Выберите чаты.\nСписок всех чатов: \n#{chats.map(&:chat_name).join(",\n")}"
+
     else
       save_context :get_mail
+      puts "No message received"
       respond_with :message, text: 'Попробуйте написать сообщение еще раз'
     end
 
   end
 
-  def choose_chats(*)
-    chat = Chat.all
-    chat.each do |chat|
+  def choose_chats(message, *)
+    return if chat['type'] != 'private'
 
-    end
+    selected_chats = message
+
+    # selected_chats = selected_chats.split(/,\s*/).map { |chat| chat.split('-').first.strip }
+    puts("Список выбранных чатов: #{selected_chats}")
   end
 
   def my_chat_member(word = nil, *other_words)
@@ -68,6 +76,8 @@ class WebhookController < Telegram::Bot::UpdatesController
   # Be sure to use splat args and default values to not get errors when
   # someone passed more or less arguments in the message.
   def start!(word = nil, *other_words)
+    return if chat['type'] != 'private'
+
     user = find_user_by_name(from['username'])
 
     if user.nil?
@@ -110,9 +120,6 @@ class WebhookController < Telegram::Bot::UpdatesController
     # # `reply_with` also sets `reply_to_message_id`:
     # reply_with :photo, photo: File.open('party.jpg')
 
-
-
-
   private
 
   def with_locale(&block)
@@ -131,8 +138,8 @@ class WebhookController < Telegram::Bot::UpdatesController
     User.find_by(telegram_link: name)
   end
 
-  # def is_chat?
-  #   puts ('сработал is_chat')
-  # end
+  def string_chats_to_array(ctring_chats)
+
+  end
 
 end
