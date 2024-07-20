@@ -75,3 +75,5 @@ gem "cancancan", "~> 3.6"
 gem "telegram-bot", "~> 0.16.2"
 
 gem "securerandom", "~> 0.3.1"
+
+gem "telegram-bot-types", "~> 0.7.0"
