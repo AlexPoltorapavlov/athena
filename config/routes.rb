@@ -11,6 +11,8 @@ Rails.application.routes.draw do
     get 'account' => 'users/registrations#account'
   end
 
+  resources :chats
+
   # Defines the root path route ("/")
   root 'home#index'
 

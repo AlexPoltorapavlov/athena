@@ -34,9 +34,7 @@
                     <%= link_to (can?(:manage, :all) ? 'Администратор' : 'Пользователь'), root_path, class: 'text-dark bg-light btn btn-outline-secondary' %>
                   </li>
                 <li class="nav-item text-dark">
-                  <a class="text-dark bg-light btn btn-outline-secondary" href="#">
-                    Bootstrap
-                  </a>
+                  <%= link_to 'Чаты', chats_path, class: "text-dark bg-light btn btn-outline-secondary" %>
                 </li>
                 <li class="nav-item text-dark">
                   <a class="text-dark bg-light btn btn-outline-secondary" href="#">

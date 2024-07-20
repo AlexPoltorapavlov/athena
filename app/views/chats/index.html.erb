@@ -1,0 +1,26 @@
+<h2> Список чатов </h2>
+
+<div class='w-50 mt-5'>
+  <div class='w-100'>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">id</th>
+          <th scope="col">Название чата</th>
+          <th scope="col">Связь с группой</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @chats.each do |chat| %>
+          <tr>
+            <th scope="row"><%= chat.chat_id %></th>
+            <td><%= chat.chat_name %></td>
+            <td><%= chat.group %></td>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
