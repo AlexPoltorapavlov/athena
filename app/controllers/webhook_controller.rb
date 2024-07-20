@@ -25,11 +25,13 @@ class WebhookController < Telegram::Bot::UpdatesController
     return if chat['type'] != 'private'
 
     if message
-      @message = message
+      @message = update['message']['text']
       puts "Message received: #{@message}"
       chats = Chat.all
+      list_of_chats = chats.map(&:chat_name).join(", ")
+      puts ("Значение list_of_chats: \n #{list_of_chats}")
       save_context :choose_chats
-      respond_with :message, text: "Выберите чаты.\nСписок всех чатов: \n#{chats.map(&:chat_name).join(",\n")}"
+      respond_with :message, text: "Выберите чаты.\nСписок всех чатов: \n#{list_of_chats}"
 
     else
       save_context :get_mail
@@ -39,10 +41,11 @@ class WebhookController < Telegram::Bot::UpdatesController
 
   end
 
-  def choose_chats(message, *)
+  def choose_chats(message='', *)
     return if chat['type'] != 'private'
-
-    selected_chats = message
+    puts ("Заход в choose_chats \n Значение передаваемой message: \n #{message}")
+    selected_chats = update['message']['text']
+    puts ("Значение переменной selected_chats: \n #{selected_chats}")
 
     # selected_chats = selected_chats.split(/,\s*/).map { |chat| chat.split('-').first.strip }
     puts("Список выбранных чатов: #{selected_chats}")
@@ -94,7 +97,7 @@ class WebhookController < Telegram::Bot::UpdatesController
         Пароль: \"#{password}\" \n
         Приятного пользования!"
       else
-        response = "Приветствую! Я не смогла создать тебе аккаунт, попробуй запустить меня еще раз или обратитесь
+        response = "Приветствую! Я не смогла создать вам аккаунт, попробуй запустить меня еще раз или обратитесь
                     к администратору"
       end
 
