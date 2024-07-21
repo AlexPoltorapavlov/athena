@@ -10,19 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_18_082402) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_21_081823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "chats", force: :cascade do |t|
     t.string "chat_name", null: false
     t.bigint "chat_id", null: false
-    t.bigint "group_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_chats_on_chat_id", unique: true
     t.index ["chat_name"], name: "index_chats_on_chat_name", unique: true
-    t.index ["group_id"], name: "index_chats_on_group_id"
+  end
+
+  create_table "chats_groups", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "chat_id"
+    t.index ["chat_id"], name: "index_chats_groups_on_chat_id"
+    t.index ["group_id"], name: "index_chats_groups_on_group_id"
   end
 
   create_table "groups", force: :cascade do |t|
@@ -52,5 +57,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_18_082402) do
     t.index ["telegram_link"], name: "index_users_on_telegram_link", unique: true
   end
 
-  add_foreign_key "chats", "groups"
 end

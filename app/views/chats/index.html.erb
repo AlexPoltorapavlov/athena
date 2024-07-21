@@ -1,6 +1,5 @@
 <h2> Список чатов </h2>
 
-
 <table class="table">
   <thead>
     <tr>
@@ -15,7 +14,11 @@
       <tr>
         <th scope="row"><%= chat.chat_id %></th>
         <td><%= chat.chat_name %></td>
-        <td><%= chat.group %></td>
+        <td>
+          <% chat.groups.each do |group| %>
+            <%= group.group_name %>
+          <% end %>
+        </td>
         <td>
           <%= link_to "✎  Редактировать", edit_chat_path(chat), class: 'btn btn-outline-secondary w-100' %>
         </td>

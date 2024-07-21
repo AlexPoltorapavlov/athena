@@ -32,7 +32,7 @@ class AdminsController < ApplicationController
     @user = User.find(params[:id])
 
     if @user.update(user_params)
-      redirect_to admins_path, notice: 'Пользователь успешно обновлен'
+      redirect_to admin_panel_path, notice: 'Пользователь успешно обновлен'
     else
       Rails.logger.debug "User errors: #{@user.errors.full_messages}"
       render :edit_user, alert: "Ошибка при обновлении пользователя: #{@user.errors.full_messages.to_sentence}."
@@ -42,7 +42,7 @@ class AdminsController < ApplicationController
   def destroy_user
     @user = User.find(params[:id])
     @user.destroy
-    redirect_to admins_path, notice: 'Пользователь успешно удален'
+    redirect_to admin_panel_path, notice: 'Пользователь успешно удален'
   end
 
   private

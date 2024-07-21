@@ -18,9 +18,11 @@
         <th scope="row"><%= group.id %></th>
         <td><%= group.group_name %></td>
         <td>
+          <p>
           <% group.chats.each do |chat| %>
-            <%= chat.chat_name %>
+            <%= chat.chat_name %>;  
           <% end %>
+          </p>
         </td>
         <td>
           <%= link_to "✎  Редактировать", edit_group_path(group), class: 'btn btn-outline-secondary' %>

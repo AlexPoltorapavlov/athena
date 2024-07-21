@@ -2,8 +2,8 @@
 
 <%= form_for(@group) do |f| %> 
   <div class='form-group'>
-    <%= f.label :group_name, class: 'form-label mt-3' %>
+    <%= f.label :group_name, "Название группы", class: 'form-label mt-3' %>
     <%= f.text_field :group_name, class: 'form-control' %>
     </div>
-  <%= f.submit "Сохранить", class: 'btn btn-primary mt-3' %>
+  <%= f.submit "Сохранить", class: 'btn btn-dark mt-3' %>
 <% end %>

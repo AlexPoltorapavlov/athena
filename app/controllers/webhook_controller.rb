@@ -79,7 +79,7 @@ class WebhookController < Telegram::Bot::UpdatesController
     chat_info = update['my_chat_member']['chat']
 
     if bot_status == 'member'
-      chat = Chat.new( chat_id: chat_info['id'], chat_name: chat_info['title']+chat_info['id'].to_s, group: nil )
+      chat = Chat.new( chat_id: chat_info['id'], chat_name: chat_info['title']+chat_info['id'].to_s )
       chat.save!
     elsif bot_status == 'left'
       chat = Chat.find_by(chat_id: chat_info['id'])
@@ -168,7 +168,7 @@ class WebhookController < Telegram::Bot::UpdatesController
   end
 
   def add_chat_to_db(chat_id, chat_name)
-    chat = Chat.new( chat_id: chat_id, chat_name: chat_name + chat_id.to_s, group: nil )
+    chat = Chat.new( chat_id: chat_id, chat_name: chat_name + chat_id.to_s )
     chat.save!
   end
 

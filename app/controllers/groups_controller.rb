@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_action :set_group, only: %i[edit update]
+  before_action :set_group, only: %i[edit update destroy]
 
   def index
     @groups = Group.all
@@ -11,10 +11,12 @@ class GroupsController < ApplicationController
   end
 
   def edit
+    @chats = Chat.all
   end
+
   def update
     if @group.update(group_params)
-      redirect_to index, notice: 'Group was successfully updated.'
+      redirect_to groups_path, notice: 'Group was successfully updated.'
     else
       render :edit
     end
@@ -24,9 +26,18 @@ class GroupsController < ApplicationController
     @group = Group.new(group_params)
 
     if @group.save
-      redirect_to @group, notice: 'Group was successfully created.'
+      redirect_to groups_path, notice: 'Группа успешно создана'
     else
-      render :new
+      render :new, alert: @group.errors.full_messages.to_sentence
+    end
+  end
+
+  def destroy
+    @group.destroy
+    if @group.destroyed?
+      redirect_to groups_path, notice: 'Группа успешно удалена'
+    else
+      render :edit, alert: @group.errors.full_messages.to_sentence
     end
   end
 

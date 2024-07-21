@@ -1,0 +1,24 @@
+<h2>Редактирование пользователя</h2>
+<%= form_with(model: @user, url: update_user_path, local: true) do |form| %>
+
+  <div class="form-group">
+    <%= form.label :username, 'Фамилия и Имя', class: 'form-label' %>
+    <%= form.text_field :username, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :email, 'Email', class: 'form-label' %>
+    <%= form.email_field :email, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :telegram_link, 'Ссылка на пользователя (без @)', class: 'form-label' %>
+    <%= form.text_field :telegram_link, class: 'form-control' %>
+  </div>
+
+  <%= form.submit "Сохранить", class: 'btn btn-dark mt-3' %>
+<% end %>
+
+<%= button_to "Удалить", destroy_user_path, method: :delete, class: 'btn btn-outline-dark mt-3', onclick: "return confirm('Вы уверены, что хотите удалить этого пользователя?')" %>
+
+

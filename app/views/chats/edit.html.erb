@@ -2,12 +2,8 @@
 
 <%= form_for(@chat) do |f| %> 
   <div class='form-group'>
-    <%= f.label :chat_name, class: 'form-label mt-3' %>
+    <%= f.label :chat_name, 'Название чата', class: 'form-label mt-3' %>
     <%= f.text_field :chat_name, class: 'form-control' %>
-    </div>
-  <div class='form-group mt-3'>
-    <%= f.label :group, class: 'form-label' %>
-    <%= f.text_field :group, class: 'form-control' %>
   </div>
-  <%= f.submit "Сохранить", class: 'btn btn-primary mt-3' %>
+  <%= f.submit "Сохранить", class: 'btn btn-dark mt-3' %>
 <% end %>
