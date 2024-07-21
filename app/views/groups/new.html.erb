@@ -1,0 +1,9 @@
+<h2>Новая группа</h2>
+
+<%= form_for(@group) do |f| %> 
+  <div class='form-group'>
+    <%= f.label :group_name, class: 'form-label mt-3' %>
+    <%= f.text_field :group_name, class: 'form-control' %>
+    </div>
+  <%= f.submit "Сохранить", class: 'btn btn-primary mt-3' %>
+<% end %>

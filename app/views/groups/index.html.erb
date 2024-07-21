@@ -1,0 +1,32 @@
+<h2> Группы </h2>
+<div class='d-flex justify-content-between'>
+  <p class="fw-bold"> Список групп</p>
+  <%= link_to 'Добавить', new_group_path, class: 'btn btn-dark'%>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">id</th>
+      <th scope="col">Название группы</th>
+      <th scope="col">Чаты</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @groups.each do |group| %>
+      <tr>
+        <th scope="row"><%= group.id %></th>
+        <td><%= group.group_name %></td>
+        <td>
+          <% group.chats.each do |chat| %>
+            <%= chat.chat_name %>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to "✎  Редактировать", edit_group_path(group), class: 'btn btn-outline-secondary' %>
+        </td>
+    <% end %>
+  </tbody>
+</table>
+
+

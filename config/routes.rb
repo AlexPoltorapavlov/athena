@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   end
 
   resources :chats
+  resources :groups
 
   # Defines the root path route ("/")
   root 'home#index'

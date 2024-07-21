@@ -1,0 +1,13 @@
+<%= form_with(model: @group, url: group_path(@group), method: :patch) do |form| %>
+  <%= form.label :group_name, "Название группы", class: 'form-label' %>
+  <%= form.text_field :group_name, class: 'form-control'%>
+
+  <h3>Чаты</h3>
+  <%= form.collection_check_boxes :chat_ids, Chat.all, :id, :chat_name do |b| %>
+    <%= b.label class:"label-checkbox" do%>
+      <%=b.check_box + b.text%>
+    <% end %>
+  <% end %>
+
+  <%= form.submit 'Подтвердить' %>
+<% end %>
