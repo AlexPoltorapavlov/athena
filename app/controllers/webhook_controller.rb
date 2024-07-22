@@ -24,48 +24,115 @@ class WebhookController < Telegram::Bot::UpdatesController
     when 'send_to_chat'
       choose_chats
     when 'send_to_everyone'
-      answer_callback_query('You clicked button 3')
+      confirm_mailing('all')
     when 'rewrite_mail'
-      answer_callback_query('You clicked button 4')
+      start_mailing!
     when 'confirm_chats'
-      @@selected_chats.each do |chat|
-        bot.send_message(chat_id: chat.chat_id, text: @@message_for_mailing)
-      end
-      respond_with :message, text: 'Сообщение успешно отправлено!'
+      confirm_mailing('chat')
     when 'confirm_groups'
-      @@selected_groups.each do |group|
-        group.chats.each do |chat|
-          bot.send_message(chat_id: chat.chat_id, text: @@message_for_mailing)
-        end
-      end
-      respond_with :message, text: 'Сообщение успешно отправлено!'
+      confirm_mailing('group')
     when /\Achat_/
-      chat_id = data.split('_')[1].to_i
-      chat = Chat.find(chat_id)
-      if @@selected_chats.include?(chat)
-        @@selected_chats.delete(chat)
-        chat_button_text = chat.chat_name
-      else
-        @@selected_chats << chat
-        chat_button_text = "✅ #{chat.chat_name}"
-      end
-      edit_message(:text, text: 'Выберите чаты для отправки', reply_markup: {
-        inline_keyboard: Chat.all.map { |c| [{ text: (@@selected_chats.include?(c) ? "✅ #{c.chat_name}" : (c == chat ? chat_button_text : c.chat_name)), callback_data: "chat_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_chats'}]
-      })
+      chat_list_to_select(data)
     when /\Agroup_/
-      group_id = data.split('_')[1].to_i
-      group = Group.find(group_id)
-      if @@selected_groups.include?(group)
-        @@selected_groups.delete(group)
-        group_button_text = group.group_name
-      else
-        @@selected_groups << group
-        group_button_text = "✅ #{group.group_name}"
-      end
-      edit_message(:text, text: 'Выберите группы для отправки', reply_markup: {
-        inline_keyboard: Group.all.map { |c| [{ text: (@@selected_groups.include?(c) ? "✅ #{c.group_name}" : (c == group ? group_button_text : c.group_name)), callback_data: "group_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_groups'}]
-      })
+      group_list_to_select(data)
+    when 'send_mails_to_groups'
+      send_mails_to_groups
+    when 'send_mails_to_chats'
+      send_mails_to_chats
+    when 'choose_all_chats'
+      choose_all_chats
     end
+  end
+
+  def chat_list_to_select(data)
+    chat_id = data.split('_')[1].to_i
+    chat = Chat.find(chat_id)
+    if @@selected_chats.include?(chat)
+      @@selected_chats.delete(chat)
+      chat_button_text = chat.chat_name
+    else
+      @@selected_chats << chat
+      chat_button_text = "✅ #{chat.chat_name}"
+    end
+    edit_message(:text, text: 'Выберите чаты для отправки', reply_markup: {
+      inline_keyboard: Chat.all.map { |c| [{ text: (@@selected_chats.include?(c) ? "✅ #{c.chat_name}" : (c == chat ? chat_button_text : c.chat_name)), callback_data: "chat_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_chats'}]
+    })
+  end
+
+  def confirm_mailing(type_flag)
+    groups = []
+    chats = []
+    if type_flag == 'chat'
+      chats = @@selected_chats.map(&:chat_name).join(', ')
+      respond_with :message, text: "Текст сообщения: #{@@message_for_mailing}\n\nЧаты: #{chats}", reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Отправить', callback_data: 'send_mails_to_chats' }],
+          [{ text: 'Выбрать чаты заново', callback_data: 'send_to_chat' }],
+          [{ text: 'Ввести сообщение заново', callback_data: 'rewrite_mail' }]
+        ]
+      }
+    elsif type_flag == 'group'
+      groups = @@selected_groups.map(&:group_name).join(', ')
+      respond_with :message, text: "Текст сообщения: #{@@message_for_mailing}\n\Группы: #{groups}", reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Отправить', callback_data: 'send_mails_to_groups' }],
+          [{ text: 'Выбрать группы заново', callback_data: 'send_to_group' }],
+          [{ text: 'Ввести сообщение заново', callback_data: 'rewrite_mail' }]
+        ]
+      }
+    elsif type_flag == 'all'
+      chats = Chat.all.map(&:chat_name).join(', ')
+      respond_with :message, text: "Текст сообщения: #{@@message_for_mailing}\n\nЧаты: все!", reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Отправить', callback_data: 'choose_all_chats' }],
+          [{ text: 'Выбрать чаты заново', callback_data: 'send_to_chat' }],
+          [{ text: 'Ввести сообщение заново', callback_data: 'rewrite_mail' }]
+        ]
+      }
+    end
+  end
+
+  def group_list_to_select(data)
+    group_id = data.split('_')[1].to_i
+    group = Group.find(group_id)
+    if @@selected_groups.include?(group)
+      @@selected_groups.delete(group)
+      group_button_text = group.group_name
+    else
+      @@selected_groups << group
+      group_button_text = "✅ #{group.group_name}"
+    end
+    edit_message(:text, text: 'Выберите группы для отправки', reply_markup: {
+      inline_keyboard: Group.all.map { |c| [{ text: (@@selected_groups.include?(c) ? "✅ #{c.group_name}" : (c == group ? group_button_text : c.group_name)), callback_data: "group_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_groups'}]
+    })
+  end
+
+  def send_mails_to_chats
+    @@selected_chats.each do |chat|
+      bot.send_message(chat_id: chat.chat_id, text: @@message_for_mailing)
+    end
+    respond_with :message, text: 'Сообщение успешно отправлено!'
+  end
+
+  def send_mails_to_groups
+    chat_ids = Set.new
+
+    @@selected_groups.each do |group|
+      group.chats.each do |chat|
+        chat_ids.add(chat.chat_id)
+      end
+    end
+
+    chat_ids.each do |chat_id|
+      bot.send_message(chat_id: chat_id, text: @@message_for_mailing)
+    end
+
+    respond_with :message, text: 'Сообщение успешно отправлено!'
+  end
+
+  def choose_all_chats
+    @@selected_chats = Chat.all
+    send_mails_to_chats
   end
 
   def choose_groups
@@ -109,23 +176,6 @@ class WebhookController < Telegram::Bot::UpdatesController
       save_context :get_mail
       puts "No message received"
       respond_with :message, text: 'Попробуйте написать сообщение еще раз'
-    end
-
-  end
-
-  def send_mails(message=nil, *)
-    case message.downcase
-    when 'отправить'
-      @@selected_chats.each do |chat|
-        chat_id = find_chat_by_name(chat)
-        bot.send_message(chat_id: chat_id.chat_id, text: @@message_for_mailing)
-      end
-      @@selected_chats = nil
-      @@message_for_mailing = nil
-      puts ("Переменные после очистки: #{@@selected_chats} #{@@message_for_mailing}")
-    else
-      save_context :send_mails
-      respond_with :message, text: 'Что-то не так, попробуйте ввести команду еще раз'
     end
   end
 

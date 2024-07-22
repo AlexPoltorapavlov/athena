@@ -34,7 +34,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_21_081823) do
     t.string "group_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["group_name"], name: "index_groups_on_group_name", unique: true
   end
 
   create_table "users", force: :cascade do |t|
