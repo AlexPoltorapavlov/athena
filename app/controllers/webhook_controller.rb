@@ -17,6 +17,73 @@ class WebhookController < Telegram::Bot::UpdatesController
     # respond_with(:message, text: message['text'])
   end
 
+  def callback_query(data)
+    case data
+    when 'send_to_group'
+      choose_groups
+    when 'send_to_chat'
+      choose_chats
+    when 'send_to_everyone'
+      answer_callback_query('You clicked button 3')
+    when 'rewrite_mail'
+      answer_callback_query('You clicked button 4')
+    when 'confirm_chats'
+      @@selected_chats.each do |chat|
+        bot.send_message(chat_id: chat.chat_id, text: @@message_for_mailing)
+      end
+      respond_with :message, text: 'Сообщение успешно отправлено!'
+    when 'confirm_groups'
+      @@selected_groups.each do |group|
+        group.chats.each do |chat|
+          bot.send_message(chat_id: chat.chat_id, text: @@message_for_mailing)
+        end
+      end
+      respond_with :message, text: 'Сообщение успешно отправлено!'
+    when /\Achat_/
+      chat_id = data.split('_')[1].to_i
+      chat = Chat.find(chat_id)
+      if @@selected_chats.include?(chat)
+        @@selected_chats.delete(chat)
+        chat_button_text = chat.chat_name
+      else
+        @@selected_chats << chat
+        chat_button_text = "✅ #{chat.chat_name}"
+      end
+      edit_message(:text, text: 'Выберите чаты для отправки', reply_markup: {
+        inline_keyboard: Chat.all.map { |c| [{ text: (@@selected_chats.include?(c) ? "✅ #{c.chat_name}" : (c == chat ? chat_button_text : c.chat_name)), callback_data: "chat_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_chats'}]
+      })
+    when /\Agroup_/
+      group_id = data.split('_')[1].to_i
+      group = Group.find(group_id)
+      if @@selected_groups.include?(group)
+        @@selected_groups.delete(group)
+        group_button_text = group.group_name
+      else
+        @@selected_groups << group
+        group_button_text = "✅ #{group.group_name}"
+      end
+      edit_message(:text, text: 'Выберите группы для отправки', reply_markup: {
+        inline_keyboard: Group.all.map { |c| [{ text: (@@selected_groups.include?(c) ? "✅ #{c.group_name}" : (c == group ? group_button_text : c.group_name)), callback_data: "group_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_groups'}]
+      })
+    end
+  end
+
+  def choose_groups
+    @@selected_groups = []
+
+    respond_with :message, text: 'Выберите группы для отправки', reply_markup: {
+      inline_keyboard: Group.all.map { |c| [{ text: c.group_name, callback_data: "group_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_groups'}]
+    }
+  end
+
+  def choose_chats
+    @@selected_chats = []
+
+    respond_with :message, text: 'Выберите чаты для отправки', reply_markup: {
+      inline_keyboard: Chat.all.map { |c| [{ text: c.chat_name, callback_data: "chat_#{c.id}" }] } << [{text: 'Подтвердить', callback_data: 'confirm_chats'}]
+    }
+  end
+
   def start_mailing!(*)
     return if chat['type'] != 'private'
     save_context :get_mail
@@ -27,14 +94,16 @@ class WebhookController < Telegram::Bot::UpdatesController
     return if chat['type'] != 'private'
 
     if message
-      message = update['message']['text']
-      @@message_for_mailing = message
-      puts "Message received: #{@message_for_mailing}"
-      chats = Chat.all
-      list_of_chats = chats.map(&:chat_name).join(", ")
-      puts ("Значение list_of_chats: \n #{list_of_chats}")
-      save_context :choose_chats
-      respond_with :message, text: "Выберите чаты.\nСписок всех чатов: \n#{list_of_chats}"
+      @@message_for_mailing = update['message']['text']
+
+      respond_with :message, text: "Кому хотите отправить сообщение? \n", reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Отправить в группу',        callback_data: 'send_to_group' }],
+          [{ text: 'Отправить в чат',           callback_data: 'send_to_chat' }],
+          [{ text: 'Отправить всем',            callback_data: 'send_to_everyone' }],
+          [{ text: 'Ввести сообщение заново',   callback_data: 'rewrite_mail' }]
+        ]
+      }
 
     else
       save_context :get_mail
@@ -42,19 +111,6 @@ class WebhookController < Telegram::Bot::UpdatesController
       respond_with :message, text: 'Попробуйте написать сообщение еще раз'
     end
 
-  end
-
-  def choose_chats(message=nil, *)
-    return if chat['type'] != 'private'
-    selected_chats = update['message']['text']
-    @@selected_chats = selected_chats.split(/,\s*/)
-    save_context :send_mails
-    respond_with :message, text: "Подтвердите данные перед отправкой: \n
-    Сообщение: \"#{@@message_for_mailing}\" \n
-    Список чатов: #{@@selected_chats}
-    Если все верно, напишите \"Отправить\" \n
-    Если хотите изменить список чатов, то напишите \"Чаты\" \n
-    Ввести все данные заново: напишите /start_mailing"
   end
 
   def send_mails(message=nil, *)
@@ -88,18 +144,6 @@ class WebhookController < Telegram::Bot::UpdatesController
 
   end
 
-  # For the following types of updates commonly used params are passed as arguments,
-  # full payload object is available with `payload` instance method.
-  #
-  #   message(payload)
-  #   inline_query(query, offset)
-  #   chosen_inline_result(result_id, query)
-  #   callback_query(data)
-
-  # Define public methods ending with `!` to handle commands.
-  # Command arguments will be parsed and passed to the method.
-  # Be sure to use splat args and default values to not get errors when
-  # someone passed more or less arguments in the message.
   def start!(word = nil, *other_words)
     return if chat['type'] != 'private'
 
@@ -129,21 +173,6 @@ class WebhookController < Telegram::Bot::UpdatesController
 
     respond_with :message, text: response
   end
-
-    # do_smth_with(word)
-
-    # full message object is also available via `payload` instance method:
-    # process_raw_message(payload['text'])
-
-    # There are `chat` & `from` shortcut methods.
-    # For callback queries `chat` is taken from `message` when it's available.
-    # response = from ? "Привет, #{from['username']}!" : 'Привет!'
-
-    # # There is `respond_with` helper to set `chat_id` from received message:
-    # respond_with :message, text: response
-
-    # # `reply_with` also sets `reply_to_message_id`:
-    # reply_with :photo, photo: File.open('party.jpg')
 
   private
 
